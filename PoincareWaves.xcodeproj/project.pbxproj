@@ -10,6 +10,7 @@
 		81251CCB183BE43600E80E20 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81251CCA183BE43600E80E20 /* Foundation.framework */; };
 		81251CCE183BE43600E80E20 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 81251CCD183BE43600E80E20 /* main.m */; };
 		81251CD2183BE43600E80E20 /* PoincareWaves.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 81251CD1183BE43600E80E20 /* PoincareWaves.1 */; };
+		81251CD9183BE4B100E80E20 /* GLNumericalModelingKit.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 81251CD8183BE4B100E80E20 /* GLNumericalModelingKit.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +32,7 @@
 		81251CCD183BE43600E80E20 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		81251CD0183BE43600E80E20 /* PoincareWaves-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PoincareWaves-Prefix.pch"; sourceTree = "<group>"; };
 		81251CD1183BE43600E80E20 /* PoincareWaves.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PoincareWaves.1; sourceTree = "<group>"; };
+		81251CD8183BE4B100E80E20 /* GLNumericalModelingKit.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = GLNumericalModelingKit.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81251CD9183BE4B100E80E20 /* GLNumericalModelingKit.dylib in Frameworks */,
 				81251CCB183BE43600E80E20 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,6 +68,7 @@
 		81251CC9183BE43600E80E20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				81251CD8183BE4B100E80E20 /* GLNumericalModelingKit.dylib */,
 				81251CCA183BE43600E80E20 /* Foundation.framework */,
 			);
 			name = Frameworks;
@@ -219,6 +223,15 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "PoincareWaves/PoincareWaves-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(BUILT_PRODUCTS_DIR)/usr/local/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/PoincareWavesWorkspace-dhaifajjpmseizesrptciivwrgfq/Build/Products/Debug",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -228,6 +241,15 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "PoincareWaves/PoincareWaves-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(BUILT_PRODUCTS_DIR)/usr/local/include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/PoincareWavesWorkspace-dhaifajjpmseizesrptciivwrgfq/Build/Products/Debug",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -251,6 +273,7 @@
 				81251CD7183BE43600E80E20 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
