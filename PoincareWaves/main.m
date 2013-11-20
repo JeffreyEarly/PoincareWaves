@@ -22,7 +22,7 @@ int main(int argc, const char * argv[])
 		GLFloat f0 = 2*(7.2921e-5)*sin(latitude*M_PI/180);
 		GLFloat g = 9.81;
 		GLFloat D = pow(L_r*f0,2)/g;
-//		GLFloat c = sqrt(g*D);
+		GLFloat c = sqrt(g*D);
 		
 		/************************************************************************************************/
 		/*		Define the problem dimensions															*/
@@ -59,7 +59,7 @@ int main(int argc, const char * argv[])
 		GLFloat maxPeriod = 2*M_PI/[omega minNow];
 		
 		NSLog(@"The minimum wave period is %.0f minutes (based on the horizontal resolution), maximum is %.1f hours (based on the Coriolis frequency).", round(minPeriod/60), maxPeriod/(60*60));
-		//NSLog(@"Sampling for longer than %.1f days will expose the time discretization (this is the domainWidth/c).", min((2*pi./abs(diff(omega(1,:),1,2))))/86400);
+		NSLog(@"Sampling for longer than %.1f days will expose the time discretization (this is the domainWidth/c).", L_domain/(c*86400));
 		
 		/************************************************************************************************/
 		/*		Now set the magnitude of the wave at each component.									*/
