@@ -33,6 +33,8 @@
 		81251CD0183BE43600E80E20 /* PoincareWaves-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PoincareWaves-Prefix.pch"; sourceTree = "<group>"; };
 		81251CD1183BE43600E80E20 /* PoincareWaves.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PoincareWaves.1; sourceTree = "<group>"; };
 		81251CD8183BE4B100E80E20 /* GLNumericalModelingKit.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = GLNumericalModelingKit.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		81A81E36183EB99100E97BBC /* ModelNotes.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = ModelNotes.pdf; sourceTree = "<group>"; };
+		81A81E37183EB99100E97BBC /* ModelNotes.tex */ = {isa = PBXFileReference; lastKnownFileType = text; path = ModelNotes.tex; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +54,7 @@
 			isa = PBXGroup;
 			children = (
 				81251CCC183BE43600E80E20 /* PoincareWaves */,
+				81A81E35183EB99100E97BBC /* Documentation */,
 				81251CC9183BE43600E80E20 /* Frameworks */,
 				81251CC8183BE43600E80E20 /* Products */,
 			);
@@ -90,6 +93,15 @@
 				81251CD0183BE43600E80E20 /* PoincareWaves-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		81A81E35183EB99100E97BBC /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				81A81E36183EB99100E97BBC /* ModelNotes.pdf */,
+				81A81E37183EB99100E97BBC /* ModelNotes.tex */,
+			);
+			path = Documentation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

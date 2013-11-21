@@ -1,0 +1,257 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\title{Poincare Wave Model Notes}
+\author{Jeffrey J. Early}
+%\date{}                                           % Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+\section{Equations of Motion}
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+Consider the following equations of motion,
+\begin{align}
+u_t  -f v - g\eta_x =& 0 \\
+v_t + f u - g\eta_y =& 0 \\
+\eta_t - H u_x - H v_y =&0.
+\end{align}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\subsection{Trial solution method}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Take a trial solution of
+\begin{equation}
+\left[\begin{array}{c}u_0 \\v_0 \\ \eta_0\end{array}\right]
+e^{i(\omega t + kx + ly)}
+\end{equation}
+
+And the equations must satisfy,
+\begin{equation}
+\left[\begin{array}{ccc}
+i\omega & -f & igk \\
+ f  & i\omega  & igl \\
+i H k & i H l & i\omega
+\end{array}\right]
+\left[\begin{array}{c}u_0 \\v_0 \\ \eta_0\end{array}\right]
+=0
+\end{equation}
+
+A solution is possible when $\omega=0$, $\omega=\sigma$ or $\omega=-\sigma$ where,
+\begin{equation}
+\sigma = \sqrt{ gH (k^2 + l^2) + f_0^2 }.
+\end{equation}
+We thus have the general solution,
+\begin{equation}
+\left[\begin{array}{c}u \\v \\ \eta\end{array}\right] =
+A \left[\begin{array}{c} -i \frac{g}{f_0} l \\ i \frac{g}{f_0} k \\ 1 \end{array}\right] e^{i(kx + ly)} +
+ B \left[\begin{array}{c} i l f_0 - \sigma k \\ -ikf_0-\sigma l \\ K^2 H \end{array}\right] e^{i( \sigma t + kx + ly)}
+ +  C \left[\begin{array}{c} - i l f_0 - \sigma k \\ ikf_0-\sigma l \\ K^2 H \end{array}\right] e^{i( - \sigma t + kx + ly)}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\subsection{Fourier transform method}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Or alternatively, we take the the Fourier transformation, using the definitions,
+\begin{align}
+f(x,y)=& \frac{1}{2\pi} \int_{-\infty}^{\infty} \hat{f}(k,l) e^{i(kx+ly)} \, dk\, dl \\
+\hat{f}(k,l)=& \frac{1}{2\pi} \int_{-\infty}^{\infty} f(x,y) e^{-i(kx+ly)} \, dx\, dy
+\end{align}
+so the equations become,
+\begin{align}
+\hat{u}_t  -f \hat{v} - i g k \hat{\eta} =& 0 \\
+\hat{v}_t + f \hat{u} - i g l \hat{\eta} =& 0 \\
+\hat{\eta}_t - H i k \hat{u} - H i l \hat{v} =&0.
+\end{align}
+In matrix form this is,
+\begin{equation}
+\frac{d}{dt} \left[\begin{array}{c} \hat{u} \\ \hat{v} \\ \hat{\eta} \end{array}\right]
+= \left[\begin{array}{ccc}0 & f & igk \\-f & 0 & igl \\ ikH & ilH & 0\end{array}\right]
+\left[\begin{array}{c} \hat{u} \\ \hat{v} \\ \hat{\eta} \end{array}\right]
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\subsection{Special Solution}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+When $k\neq0$, $\l=0$
+\begin{align}
+\eta(t) =& U D \frac{k}{\omega} \cos( kx + \omega t + \phi) \\
+u(t) =& U\cos( kx + \omega t + \phi) \\
+v(t) =& - U \frac{f}{\omega} \sin( kx + \omega t + \phi)
+\end{align}
+
+Rotated to a more general wave vector,
+\begin{align}
+\eta(t) =& U_{kl} D \frac{\sqrt{k^2+l^2}}{\omega} \cos( kx + ly + \omega t + \phi) \\
+u(t) =& U_{kl} \cos( kx + ly + \omega t + \phi) \cos( \alpha) + U_{kl} \frac{f}{\omega} \sin( kx + ly + \omega t + \phi) \sin(\alpha) \\
+v(t) =& U_{kl} \cos( kx + ly + \omega t + \phi) \sin(\alpha) - U_{kl} \frac{f}{\omega} \sin( kx + ly + \omega t + \phi) \cos( \alpha) 
+\end{align}
+where $\alpha = \tan^{-1} \frac{l}{k}$.
+
+We want to use an FFT algorithm to quickly compute the spatial field resulting from the superposition of all these waves. In terms of wave vector components $m_{k,l}$, we need to fill in the following matrix,
+\begin{equation}
+\begin{array}{c|cccccccc} & 0 & 1 & 2 & 3 & -4 & -3 & -2 & -1 \\ \hline 0 & m_{0,0} & m_{0,1} & m_{0,2} & m_{0,3} & m_{0,-4} & m_{0,3}^\ast & m_{0,2}^\ast & m_{0,1}^\ast \\1 & m_{1,0} & m_{1,1} & m_{1,2} & m_{1,3} & m_{1,-4} & m_{1,-3} & m_{1,-2} & m_{1,-1} \\2 & m_{2,0} & m_{2,1} & m_{2,2} & m_{2,3} & m_{2,-4} & m_{2,-4} & m_{2,-2} & m_{2,-1} \\3 & m_{3,0} & m_{3,1} & m_{3,2} & m_{3,3} & m_{3,-4} & m_{3,-4} & m_{3,-2} & m_{3,-1} \\-4 & m_{-4,0} & m_{-4,1} & m_{-4,2} & m_{-4,3} & m_{-4,-4} & m_{-4,3}^\ast & m_{-4,2}^\ast & m_{-4,1}^\ast \\-3 & m_{3,0}^\ast & m_{3,-1}^\ast & m_{3,-2}^\ast & m_{3,-3}^\ast & m_{3,-4}^\ast & m_{3,3}^\ast & m_{3,2}^\ast & m_{3,1}^\ast \\-2 & m_{2,0}^\ast & m_{2,-1}^\ast & m_{2,-2}^\ast & m_{2,-3}\ast & m_{2,-4}^\ast & m_{2,3}^\ast & m_{2,2}^\ast & m_{2,1}^\ast \\-1 & m_{1,0}^\ast & m_{1,-1}^\ast & m_{1,-2}^\ast & m_{1,-3}^\ast & m_{1,-4}^\ast & m_{1,3}^\ast & m_{1,2}^\ast & m_{1,1}^\ast\end{array}.
+\end{equation}
+Notice, however, that many of the terms are redundant, given the require hermitian symmetry. Four of the components are their own conjugate, and therefore must be real. In order to construct a reasonably efficient algorithm, we should separate out the positive wave vectors and negative wave vectors,
+\begin{align}
+u(t) =& U_{kl} \cos( \theta ) \cos( \alpha) + U_{kl} \frac{f}{\omega} \sin( \theta ) \sin(\alpha) \\
+=& \frac{U_{kl}}{2} \left( e^{i\theta} + e^{-i \theta} \right) \cos \alpha - i \frac{U_{kl}}{2} \frac{f}{\omega} \left( e^{i \theta} - e^{-i\theta} \right) \sin \alpha \\
+=& \frac{U_{kl}}{2} e^{i(kx+ly)} e^{i(\omega t + \phi)} \left( \cos \alpha - i \frac{f}{\omega} \sin \alpha \right)  \\ \nonumber
+&+ \frac{U_{kl}}{2} e^{-i(kx+ly)} e^{-i(\omega t + \phi)} \left( \cos \alpha + i \frac{f}{\omega} \sin \alpha \right) 
+\end{align}
+where $\theta = kx + ly + \omega t + \phi$.
+
+Let's redo the above table for the proper ordering,
+\begin{equation}
+\begin{array}{c|ccccc|ccc} & 0 & 1 & 2 & 3 & 4 & -3 & -2 & -1 \\ \hline
+0 & m_{0,0} & m_{0,1} & m_{0,2} & m_{0,3} & m_{0,4} & m_{0,3}^\ast & m_{0,2}^\ast & m_{0,1}^\ast \\
+1 & m_{1,0} & m_{1,1} & m_{1,2} & m_{1,3} & m_{1,4} & m_{1,3}^\ast & m_{1,2}^\ast & m_{1,1}^\ast \\
+2 & m_{2,0} & m_{2,1} & m_{2,2} & m_{2,3} & m_{2,4} & m_{2,3}^\ast & m_{2,2}^\ast & m_{2,1}^\ast \\
+3 & m_{3,0} & m_{3,1} & m_{3,2} & m_{3,3} & m_{3,4} & m_{3,4}^\ast & m_{3,2}^\ast & m_{3,1}^\ast \\
+-4 & m_{-4,0} & m_{-4,1} & m_{-4,2} & m_{-4,3} & m_{-4,4} & m_{-4,3}^\ast & m_{-4,2}^\ast & m_{-4,1}^\ast \\
+-3 & m_{3,0}^\ast & m_{-3,1} & m_{-3,2} & m_{-3,3} & m_{-3,4}^\ast & m_{-3,3}^\ast & m_{-3,2}^\ast & m_{-3,1}^\ast \\
+-2 & m_{2,0}^\ast & m_{-2,1} & m_{-2,2} & m_{-2,3} & m_{-2,4}^\ast & m_{-2,3}^\ast & m_{-2,2}^\ast & m_{-2,1}^\ast \\
+-1 & m_{1,0}^\ast & m_{-1,1} & m_{-1,2} & m_{-1,3} & m_{-1,4}^\ast & m_{-1,3}^\ast & m_{-1,2}^\ast & m_{-1,1}^\ast\end{array}.
+\end{equation}
+
+We only need to set $U_{kl}$ for half of the wave numbers, since the other half is found by hermitian symmetry. Thus, we will only define the positive $k$ wave numbers. The coefficient $\hat{u}(k^+,l^\pm)$ has magnitude,
+\begin{equation}
+\hat{u}(k^+,l) = \frac{U_{kl}}{2} \left( \cos \alpha - i \frac{f}{\omega} \sin \alpha \right) e^{i (\omega t + \phi)}.
+\end{equation}
+The first value is simply set outright, but then it is evolved with $e^{i \omega t}$. This is similar to the negative wave numbers, 
+\begin{equation}
+\hat{u}(k^-,l) = \frac{U_{kl}}{2} \left( \cos \alpha + i \frac{f}{\omega} \sin \alpha \right) e^{-i (\omega t + \phi)}.
+\end{equation}
+but these evolve with the negative component.
+A couple of special cases arise,
+\begin{align}
+\hat{u}(0,0) =& U \cos( \omega t + \phi) \\
+\hat{u}(0,l^{max}) =& 0 \\
+\hat{u}(k^{max},0) =& 0 \\
+\hat{u}(k^{max},l^{max}) = & 0
+\end{align}
+In practice then, we take the matrix $\omega_{kl}$ and compute $ a_{kl} \cos( \omega_{kl} t + \phi) + b_{kl} \sin( \omega_{kl} t + \phi)$ where $a_{kl}$ is ones for everything except the zeroth frequency and the Nyquist frequency components. The matrix $b_{kl}$ is $i$ and $-i$ depending on which column its in.
+\begin{align}
+v(t) =& U_{kl} \cos( \theta ) \sin( \alpha) - U_{kl} \frac{f}{\omega} \sin( \theta ) \cos(\alpha) \\
+=& \frac{U_{kl}}{2} \left( e^{i\theta} + e^{-i \theta} \right) \sin \alpha + i \frac{U_{kl}}{2} \frac{f}{\omega} \left( e^{i \theta} - e^{-i\theta} \right) \cos \alpha \\
+=& \frac{U_{kl}}{2} e^{i(kx+ly)} e^{i(\omega t + \phi)} \left( \sin \alpha + i \frac{f}{\omega} \cos \alpha \right)  \\ \nonumber
+&+ \frac{U_{kl}}{2} e^{-i(kx+ly)} e^{-i(\omega t + \phi)} \left( \sin \alpha - i \frac{f}{\omega} \cos \alpha \right) 
+\end{align}
+
+\begin{align}
+\hat{v}(0,0) =& - U \sin( \omega t + \phi) \\
+\hat{u}(0,l^{max}) =& 0 \\
+\hat{u}(k^{max},0) =& 0 \\
+\hat{u}(k^{max},l^{max}) = & 0
+\end{align}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+\section{Solutions}
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Take a trial solution of
+\begin{equation}
+\left[\begin{array}{c}u_0 \\v_0 \\ \eta_0\end{array}\right]
+e^{-i(\omega t - kx - ly)}
+\end{equation}
+
+And the equations must satisfy,
+\begin{equation}
+\left[\begin{array}{ccc}
+-i\omega + \frac{\delta + \sigma_n}{2} & \frac{ \sigma_s - \zeta}{2} -f & igk \\
+\frac{ \sigma_s + \zeta}{2}  + f  & -i\omega + \frac{ \delta - \sigma_n}{2} & igl \\
+i H_1 k & i H_1 l & -i\omega
+\end{array}\right]
+\left[\begin{array}{c}u_0 \\v_0 \\ \eta_0\end{array}\right]
+=0
+\end{equation}
+
+\subsection{Special Solution}
+
+If we look for purely inertial oscillations with no height perturbation, then we find that,
+\begin{equation}
+\omega = -i \frac{\delta}{2} \pm \sqrt{ \left( f + \frac{\zeta}{2} \right)^2 - \frac{\sigma^2}{4} }
+\end{equation}
+where $\sigma^2 = \sigma_s^2 + \sigma_n^2$.
+
+\section{Spatially Variable Background}
+
+\begin{align}
+u_t  - f(x,y) v - g\eta_x =& 0 \\
+v_t + f(x,y) u - g\eta_y =& 0 \\
+\eta_t - H_1 u_x - H_1 v_y =&0
+\end{align}
+
+This system is quasilinear. It definitely should be solvable, no?
+
+The time rate change of the divergence is,
+\begin{equation}
+\frac{\partial }{\partial t} \nabla \cdot \mathbf{u} - f \zeta - g \nabla^2 \eta -f_x v + f_y u = 0.
+\end{equation}
+The time rate change of the curl is,
+\begin{equation}
+\frac{\partial }{\partial t} \zeta + f \nabla \cdot \mathbf{u} + u f_x + v f_y  = 0.
+\end{equation}
+
+Take a time derivative of the divergence equation to find that,
+\begin{equation}
+\frac{\partial^2 }{\partial t^2} \nabla \cdot \mathbf{u} - f \zeta_t - g \nabla^2 \eta_t -f_x v_t + f_y u_t = 0.
+\end{equation}
+Now plop in the variation of $\zeta$ equation,
+\begin{equation}
+\frac{\partial^2 }{\partial t^2} \nabla \cdot \mathbf{u} + f^2 \nabla \cdot \mathbf{u} + f u f_x + f v f_y - g \nabla^2 \eta_t -f_x v_t + f_y u_t = 0.
+\end{equation}
+Reorganize,
+\begin{equation}
+\left( \frac{\partial^2 }{\partial t^2}   + f^2  \right) \nabla \cdot \mathbf{u} +   f_x (f u - v_t) +  f_y ( f v + u_t) - g \nabla^2 \eta_t = 0.
+\end{equation}
+Substitute,
+\begin{equation}
+\left( \frac{\partial^2 }{\partial t^2}   + f^2  \right) \nabla \cdot \mathbf{u} +   f_x (2 f u - g \eta_y ) +  f_y ( 2 f v +g \eta_x ) - g \nabla^2 \eta_t = 0
+\end{equation}
+or,
+\begin{equation}
+\left( \frac{\partial^2 }{\partial t^2}   + f^2  \right) \nabla \cdot \mathbf{u} +   f_x ( g \eta_y - 2 v_t ) +  f_y ( 2 u_t - g \eta_x ) - g \nabla^2 \eta_t = 0.
+\end{equation}
+
+Hmmm, not sure which I like best. Either way,
+\begin{equation}
+\left( \frac{\partial^2 }{\partial t^2}   + f^2  \right) \eta_t+   H f_x ( g \eta_y - 2 v_t ) +  H f_y ( 2 u_t - g \eta_x ) - g H \nabla^2 \eta_t = 0.
+\end{equation}
+
+Let $f = f_0 + f_1 x$, then
+\begin{equation}
+\left( \frac{\partial^2 }{\partial t^2}   + f_0^2 + 2f_0 f_1 x + f_1^2 x^2  \right) \eta_t+   H f_1 ( g \eta_y - 2 v_t ) - g H \nabla^2 \eta_t = 0.
+\end{equation}
+
+
+
+
+\end{document}  

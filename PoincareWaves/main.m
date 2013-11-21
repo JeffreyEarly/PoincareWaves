@@ -33,9 +33,9 @@ int main(int argc, const char * argv[])
 		/*		Define the problem dimensions															*/
 		/************************************************************************************************/
 		
-		GLDimension *xDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:512 domainMin: -L_domain/2 length:L_domain];
+		GLDimension *xDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:8 domainMin: -L_domain/2 length:L_domain];
 		xDim.name = @"x";
-		GLDimension *yDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:512 domainMin: -L_domain/2  length:L_domain];
+		GLDimension *yDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:8 domainMin: -L_domain/2  length:L_domain];
 		yDim.name = @"y";
 		GLMutableDimension *tDim = [[GLMutableDimension alloc] initWithPoints: @[@(0.0)]];
 		tDim.name = @"time";
@@ -45,7 +45,7 @@ int main(int argc, const char * argv[])
 		
 		NSArray *spatialDimensions = @[xDim, yDim];
 		GLFunction *x = [GLFunction functionOfRealTypeFromDimension: xDim withDimensions: spatialDimensions forEquation: equation];
-		GLFunction *y = [GLFunction functionOfRealTypeFromDimension: yDim withDimensions: spatialDimensions forEquation: equation];
+//		GLFunction *y = [GLFunction functionOfRealTypeFromDimension: yDim withDimensions: spatialDimensions forEquation: equation];
 		
 		/************************************************************************************************/
 		/*		Create and cache the differential operators we will need								*/
@@ -76,7 +76,7 @@ int main(int argc, const char * argv[])
 		GLFunction *alpha = [l atan2: k];
 		
 		// Set the magnitude of the components
-		GLFunction *U_mag = [[[omega multiply: @(1/f0)] pow: -2.5] multiply: @(2*U_max)];
+		GLFunction *U_mag = [[[omega multiply: @(1/f0)] pow: -1.5] multiply: @(2*U_max)];
 		if (shouldEvolveInertialOnly) {
             [U_mag zero];
             U_mag = [U_mag setValue: 2*U_max atIndices: @"0,0"];
@@ -111,9 +111,9 @@ int main(int argc, const char * argv[])
 		/*		Let's also plop a float at each grid point.                                             */
 		/************************************************************************************************/
         
-        GLDimension *xFloatDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:xDim.nPoints/8 domainMin: -L_domain/2 length:L_domain];
+        GLDimension *xFloatDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:xDim.nPoints/2 domainMin: -L_domain/2 length:L_domain];
 		xFloatDim.name = @"x-float";
-		GLDimension *yFloatDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:yDim.nPoints/8 domainMin: -L_domain/2  length:L_domain];
+		GLDimension *yFloatDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:yDim.nPoints/2 domainMin: -L_domain/2  length:L_domain];
 		yFloatDim.name = @"y-float";
         
         NSArray *floatDimensions = @[xFloatDim, yFloatDim];
@@ -158,7 +158,7 @@ int main(int argc, const char * argv[])
         /*      The wave equation is solved analytically, but the particles need to be integrated.      */
 		/************************************************************************************************/
         
-        CGFloat cfl = 0.5;
+        CGFloat cfl = 0.25;
         GLFloat timeStep = cfl * xDim.sampleInterval / U_max;
         GLRungeKuttaOperation *integrator = [GLRungeKuttaOperation rungeKutta4AdvanceY: @[xPosition, yPosition] stepSize: timeStep fFromTY:^(GLScalar *time, NSArray *yNew) {
             

@@ -19,6 +19,12 @@ x = ncread(file, 'x-float');
 y = ncread(file, 'y-float');
 t = ncread(file, 'time');
 
+minX = min(xDomain);
+maxX = max(xDomain);
+
+minY = min(yDomain);
+maxY = max(yDomain);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % 	The stride indicates how many floats we will skip
@@ -39,8 +45,8 @@ figure('Position', [50 50 1920 1080])
 set(gcf,'PaperPositionMode','auto')
 set(gcf, 'Color', 'w');
 
-for iTime=1:length(t)
-%for iTime=1:1
+%for iTime=1:length(t)
+for iTime=1:70
 
 	% read in the position of the floats for the given time	
 	xpos = double(ncread(file, 'x-position', [ceil(stride/2) ceil(stride/2) iTime], [length(y)/stride length(x)/stride 1], [stride stride 1]));
@@ -49,6 +55,9 @@ for iTime=1:length(t)
 	% make everything a column vector
 	xpos = reshape(xpos, length(y)*length(x)/(stride*stride), 1);
 	ypos = reshape(ypos, length(y)*length(x)/(stride*stride), 1);
+	
+	xpos = mod( xpos-minX, maxX-minX ) + minX;
+	ypos = mod( ypos-minY, maxY-minY ) + minY;
 	
 	% default color map is only 128 shades---we need more!
 	colormap(jet(1024))	
