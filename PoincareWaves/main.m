@@ -27,15 +27,17 @@ int main(int argc, const char * argv[])
 		GLFloat c = sqrt(g*D);
         
         // This is good for unit testing.
-        BOOL shouldEvolveInertialOnly = NO;
+        BOOL shouldUnitTest = YES;
+		NSUInteger kUnit = 1;
+		NSUInteger lUnit = 0;
 		
 		/************************************************************************************************/
 		/*		Define the problem dimensions															*/
 		/************************************************************************************************/
 		
-		GLDimension *xDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:8 domainMin: -L_domain/2 length:L_domain];
+		GLDimension *xDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:16 domainMin: -L_domain/2 length:L_domain];
 		xDim.name = @"x";
-		GLDimension *yDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:8 domainMin: -L_domain/2  length:L_domain];
+		GLDimension *yDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:16 domainMin: -L_domain/2  length:L_domain];
 		yDim.name = @"y";
 		GLMutableDimension *tDim = [[GLMutableDimension alloc] initWithPoints: @[@(0.0)]];
 		tDim.name = @"time";
@@ -77,32 +79,72 @@ int main(int argc, const char * argv[])
 		
 		// Set the magnitude of the components
 		GLFunction *U_mag = [[[omega multiply: @(1/f0)] pow: -1.5] multiply: @(2*U_max)];
-		if (shouldEvolveInertialOnly) {
+		if (shouldUnitTest) {
             [U_mag zero];
-            U_mag = [U_mag setValue: 2*U_max atIndices: @"0,0"];
+            U_mag = [U_mag setValue: U_max atIndices: [NSString stringWithFormat:@"%lu,%lu", kUnit, lUnit]];
         }
-        
-//        GLFunction *filter = [GLBasisTransformOperation antialiasingFilterFromDimensions: spectralDimensions forEquation: equation];
-//        U_mag = [U_mag multiply: filter];
-		
-		// This computes how they map to u,v
-		GLFunction *u_phase = [[alpha cos] minus: [[[[alpha sin] dividedBy: omega] multiply: @(f0)] swapComplex]];
-		GLFunction *v_phase = [[alpha sin] plus: [[[[alpha cos] dividedBy: omega] multiply: @(f0)] swapComplex]];
-		
-		u_phase = [U_mag multiply: u_phase];
-		v_phase = [U_mag multiply: v_phase];
 		
 		// Initial randomized phase
 		GLFunction *phi0 = [GLFunction functionWithRandomValuesBetween: -M_PI and: M_PI withDimensions: spectralDimensions forEquation: equation];
-		if (shouldEvolveInertialOnly) [phi0 zero];
+		if (shouldUnitTest) [phi0 zero];
+		
+		if (shouldUnitTest) {
+			NSLog(@"omega/k = %f m/s", omega.pointerValue[kUnit*lDim.nPoints+lUnit]/kH.pointerValue[kUnit*lDim.nPoints+lUnit]);
+		}
+		
+		// zero all l and k nyquist frequencies, so we don't have to deal with them.
+		for (NSUInteger i=0; i<kDim.nPoints; i++) {
+			U_mag.pointerValue[i*lDim.nPoints + (lDim.nPoints-1)] = 0;
+		}
+		for (NSUInteger j=0; j<lDim.nPoints; j++) {
+			U_mag.pointerValue[ (kDim.nPoints/2)*lDim.nPoints + j] = 0;
+		}
+		
+		// Fix the l=0, k=1..N/2-1 components
+		for (NSUInteger i=1; i<kDim.nPoints/2; i++) {
+//			U_mag.pointerValue[(kDim.nPoints-i)*lDim.nPoints] = U_mag.pointerValue[i*lDim.nPoints] ;
+//			alpha.pointerValue[(kDim.nPoints-i)*lDim.nPoints] = alpha.pointerValue[i*lDim.nPoints];
+//			omega.pointerValue[(kDim.nPoints-i)*lDim.nPoints] = -omega.pointerValue[i*lDim.nPoints];
+			phi0.pointerValue[(kDim.nPoints-i)*lDim.nPoints] = -phi0.pointerValue[i*lDim.nPoints];
+		}
+		
+		// This computes how they map to u,v
+		
+		GLFunction *fomega = [omega scalarDivide: f0];
+		
+		GLFunction *u_phase = [[alpha cos] minus: [[[alpha sin] multiply: fomega] swapComplex]];
+		GLFunction *v_phase = [[alpha sin] plus: [[[alpha cos] multiply: fomega] swapComplex]];
+		
+		u_phase = [U_mag multiply: u_phase];
+		v_phase = [U_mag multiply: v_phase];
+		u_phase.name = @"u_phase";
+		v_phase.name = @"v_phase";
+		
+		// Fix the l=0, k=1..N/2-1 components
+//		for (NSUInteger i=1; i<kDim.nPoints/2; i++) {
+//			omega.pointerValue[(kDim.nPoints-i)*lDim.nPoints] = -omega.pointerValue[i*lDim.nPoints];
+//			
+//			u_phase.pointerValue[(kDim.nPoints-i)*lDim.nPoints] = u_phase.pointerValue[i*lDim.nPoints];
+//			u_phase.pointerValue[u_phase.nDataPoints +(kDim.nPoints-i)*lDim.nPoints] = -u_phase.pointerValue[u_phase.nDataPoints + i*lDim.nPoints];
+//			
+//			v_phase.pointerValue[(kDim.nPoints-i)*lDim.nPoints] = v_phase.pointerValue[i*lDim.nPoints];
+//			v_phase.pointerValue[u_phase.nDataPoints +(kDim.nPoints-i)*lDim.nPoints] = -v_phase.pointerValue[u_phase.nDataPoints + i*lDim.nPoints];
+//		}
 		
 		/************************************************************************************************/
 		/*		Now run the model																		*/
 		/************************************************************************************************/
 		
-		GLScalar *t = [GLScalar scalarWithValue: 0.75*2*M_PI/f0 forEquation: equation];
+		GLScalar *t = [GLScalar scalarWithValue: 0.0*2*M_PI/f0 forEquation: equation];
 		GLFunction *phi = [[omega multiply: t] plus: phi0];
-		GLFunction *time_phase = [[[phi cos] multiply: @(0.5)] plus: [[[phi sin] multiply: @(0.5)] swapComplex]];
+		GLFunction *time_phase = [[phi swapComplex] exponentiate];
+		
+		GLFunction *tmp = [u_phase multiply: time_phase];
+		
+		for (NSUInteger i=0; i<u_phase.nDataElements; i++) {
+			if ( i%lDim.nPoints == 0) printf("\n");
+			printf("%.1g ", tmp.pointerValue[i]);
+		}
 		
 		GLFunction *u = [[u_phase multiply: time_phase] transformToBasis: @[@(kGLDeltaBasis), @(kGLDeltaBasis)]];
 		GLFunction *v = [[v_phase multiply: time_phase] transformToBasis: @[@(kGLDeltaBasis), @(kGLDeltaBasis)]];
@@ -111,9 +153,9 @@ int main(int argc, const char * argv[])
 		/*		Let's also plop a float at each grid point.                                             */
 		/************************************************************************************************/
         
-        GLDimension *xFloatDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:xDim.nPoints/2 domainMin: -L_domain/2 length:L_domain];
+        GLDimension *xFloatDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:xDim.nPoints/16 domainMin: 0 length:L_domain];
 		xFloatDim.name = @"x-float";
-		GLDimension *yFloatDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:yDim.nPoints/2 domainMin: -L_domain/2  length:L_domain];
+		GLDimension *yFloatDim = [[GLDimension alloc] initDimensionWithGrid: kGLPeriodicGrid nPoints:yDim.nPoints/16 domainMin: 0  length:L_domain];
 		yFloatDim.name = @"y-float";
         
         NSArray *floatDimensions = @[xFloatDim, yFloatDim];
@@ -158,20 +200,22 @@ int main(int argc, const char * argv[])
         /*      The wave equation is solved analytically, but the particles need to be integrated.      */
 		/************************************************************************************************/
         
-        CGFloat cfl = 0.25;
+        CGFloat cfl = 0.05;
         GLFloat timeStep = cfl * xDim.sampleInterval / U_max;
-        GLRungeKuttaOperation *integrator = [GLRungeKuttaOperation rungeKutta4AdvanceY: @[xPosition, yPosition] stepSize: timeStep fFromTY:^(GLScalar *time, NSArray *yNew) {
+        GLRungeKuttaOperation *integrator = [GLRungeKuttaOperation rungeKutta4AdvanceY: @[xPosition, yPosition] stepSize: timeStep fFromTY:^(GLScalar *time2, NSArray *yNew) {
             
-            GLFunction *phi = [[omega multiply: time] plus: phi0];
-            GLFunction *time_phase = [[[phi cos] multiply: @(0.5)] plus: [[[phi sin] multiply: @(0.5)] swapComplex]];
+            GLFunction *phi2 = [[omega multiply: time2] plus: phi0];
+            GLFunction *time_phase2 = [[phi2 swapComplex] exponentiate];
             
-            GLFunction *u = [[u_phase multiply: time_phase] transformToBasis: @[@(kGLDeltaBasis), @(kGLDeltaBasis)]];
-            GLFunction *v = [[v_phase multiply: time_phase] transformToBasis: @[@(kGLDeltaBasis), @(kGLDeltaBasis)]];
+            GLFunction *u2 = [[u_phase multiply: time_phase2] transformToBasis: @[@(kGLDeltaBasis), @(kGLDeltaBasis)]];
+            GLFunction *v2 = [[v_phase multiply: time_phase2] transformToBasis: @[@(kGLDeltaBasis), @(kGLDeltaBasis)]];
         
-			GLSimpleInterpolationOperation *interp = [[GLSimpleInterpolationOperation alloc] initWithFirstOperand: @[u, v] secondOperand: yNew];
+			GLSimpleInterpolationOperation *interp = [[GLSimpleInterpolationOperation alloc] initWithFirstOperand: @[u2, v2] secondOperand: yNew];
 			
 			return interp.result;
 		}];
+		
+//		NSLog(integrator.graphvisDescription);
         
         GLFloat maxTime = maxInertialPeriods*2*M_PI/f0;
         GLFloat sampleTime = sampleTimeInMinutes*60;
@@ -184,11 +228,15 @@ int main(int argc, const char * argv[])
                 
                 t = [GLScalar scalarWithValue: time forEquation: equation];
                 phi = [[omega multiply: t] plus: phi0];
-                time_phase = [[[phi cos] multiply: @(0.5)] plus: [[[phi sin] multiply: @(0.5)] swapComplex]];
+                time_phase = [[phi swapComplex] exponentiate];
                 
                 u = [[u_phase multiply: time_phase] transformToBasis: @[@(kGLDeltaBasis), @(kGLDeltaBasis)]];
                 v = [[v_phase multiply: time_phase] transformToBasis: @[@(kGLDeltaBasis), @(kGLDeltaBasis)]];
                 
+				GLFunction *xpos = yout[0];
+				GLFunction *ypos = yout[1];
+//				NSLog(@"(x,y)=(%f,%f)", xpos.pointerValue[0], ypos.pointerValue[0]);
+				
 				[tDim addPoint: @(time)];
 				[uHistory concatenateWithLowerDimensionalVariable: u alongDimensionAtIndex:0 toIndex: (tDim.nPoints-1)];
                 [vHistory concatenateWithLowerDimensionalVariable: v alongDimensionAtIndex:0 toIndex: (tDim.nPoints-1)];
