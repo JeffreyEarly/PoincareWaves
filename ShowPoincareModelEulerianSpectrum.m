@@ -62,8 +62,11 @@ hold on
 plot( fn(fitIndices), fit(fitIndices), 'r')
 slope = P(1)
 
+
+xindices = 1:2:length(x);
+yindices = 1:2:length(y);
 figure
 iTime = 2;
-quiver(x,y,u3d(:,:,iTime),v3d(:,:,iTime),0.8)
+quiver(x(xindices),y(yindices),u3d(xindices,yindices,iTime),v3d(xindices,yindices,iTime),0.8)
 xlim([min(x) max(x)])
 ylim([min(y) max(y)])

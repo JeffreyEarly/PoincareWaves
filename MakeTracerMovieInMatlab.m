@@ -1,5 +1,5 @@
-file = '/Users/jearly/Desktop/PoincareWaves.nc';
-FramesFolder ='/Users/jearly/Desktop/PoincareWavesFrames';
+file = '/Users/jearly/Desktop/PoincareWaves2.nc';
+FramesFolder ='/Users/jearly/Desktop/PoincareWavesFrames2';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -29,7 +29,7 @@ maxY = max(yDomain);
 %
 % 	The stride indicates how many floats we will skip
 %
-stride = 1;
+stride = 2;
 floatSize = 4;
 
 % Read in the initial position of the floats.
@@ -46,7 +46,7 @@ set(gcf,'PaperPositionMode','auto')
 set(gcf, 'Color', 'w');
 
 %for iTime=1:length(t)
-for iTime=1:70
+for iTime=9:9
 
 	% read in the position of the floats for the given time	
 	xpos = double(ncread(file, 'x-position', [ceil(stride/2) ceil(stride/2) iTime], [length(y)/stride length(x)/stride 1], [stride stride 1]));
@@ -89,6 +89,6 @@ for iTime=1:70
 	set( gca, 'clim', [min(x) max(x)] );
 	
 	% write everything out	
-	output = sprintf('%s/Day_%03d', FramesFolder,iTime-1);
+	output = sprintf('%s/%03d', FramesFolder,iTime-1);
 	print('-depsc2', output)
 end
