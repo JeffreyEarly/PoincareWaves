@@ -45,8 +45,8 @@ figure('Position', [50 50 1920 1080])
 set(gcf,'PaperPositionMode','auto')
 set(gcf, 'Color', 'w');
 
-%for iTime=1:length(t)
-for iTime=9:9
+for iTime=1:length(t)
+%for iTime=9:9
 
 	% read in the position of the floats for the given time	
 	xpos = double(ncread(file, 'x-position', [ceil(stride/2) ceil(stride/2) iTime], [length(y)/stride length(x)/stride 1], [stride stride 1]));
