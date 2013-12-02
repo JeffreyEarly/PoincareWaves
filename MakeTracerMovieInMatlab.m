@@ -29,8 +29,8 @@ maxY = max(yDomain);
 %
 % 	The stride indicates how many floats we will skip
 %
-stride = 2;
-floatSize = 4;
+stride = 4;
+floatSize = 5;
 
 % Read in the initial position of the floats.
 % We will use this information to maintain a constant color on each float.

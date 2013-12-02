@@ -1,9 +1,10 @@
-\documentclass[11pt]{amsart}
+\documentclass[11pt]{article}
 \usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
 \geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
 %\geometry{landscape}                % Activate for for rotated page geometry
 \usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
 \usepackage{graphicx}
+\usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{epstopdf}
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
@@ -27,14 +28,14 @@
 
 Consider the following equations of motion,
 \begin{align}
-u_t  -f v - g\eta_x =& 0 \\
-v_t + f u - g\eta_y =& 0 \\
+u_t  -f_0 v - g\eta_x =& 0 \\
+v_t + f_0 u - g\eta_y =& 0 \\
 \eta_t - H u_x - H v_y =&0.
 \end{align}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\subsection{Trial solution method}
+\subsection{Solution}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -47,8 +48,8 @@ e^{i(\omega t + kx + ly)}
 And the equations must satisfy,
 \begin{equation}
 \left[\begin{array}{ccc}
-i\omega & -f & igk \\
- f  & i\omega  & igl \\
+i\omega & -f_0 & igk \\
+ f_0  & i\omega  & igl \\
 i H k & i H l & i\omega
 \end{array}\right]
 \left[\begin{array}{c}u_0 \\v_0 \\ \eta_0\end{array}\right]
@@ -63,8 +64,8 @@ We thus have the general solution,
 \begin{equation}
 \left[\begin{array}{c}u \\v \\ \eta\end{array}\right] =
 A \left[\begin{array}{c} -i \frac{g}{f_0} l \\ i \frac{g}{f_0} k \\ 1 \end{array}\right] e^{i(kx + ly)} +
- B \left[\begin{array}{c} i l f_0 - \sigma k \\ -ikf_0-\sigma l \\ K^2 H \end{array}\right] e^{i( \sigma t + kx + ly)}
- +  C \left[\begin{array}{c} - i l f_0 - \sigma k \\ ikf_0-\sigma l \\ K^2 H \end{array}\right] e^{i( - \sigma t + kx + ly)}
+ B \left[\begin{array}{c} \frac{i l f_0 - \sigma k}{K^2 H} \\ \frac{-ikf_0-\sigma l}{K^2 H} \\ 1 \end{array}\right] e^{i( \sigma t + kx + ly)}
+ +  C \left[\begin{array}{c} \frac{- i l f_0 - \sigma k}{K^2 H} \\ \frac{ikf_0-\sigma l}{K^2 H} \\ 1 \end{array}\right] e^{i( - \sigma t + kx + ly)}
 \end{equation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
