@@ -19,11 +19,13 @@ x = ncread(file, 'x-float');
 y = ncread(file, 'y-float');
 t = ncread(file, 'time');
 
+deltaX = xDomain(2)-xDomain(1);
 minX = min(xDomain);
-maxX = max(xDomain);
+maxX = max(xDomain+deltaX);
 
+deltaY = yDomain(2)-yDomain(1);
 minY = min(yDomain);
-maxY = max(yDomain);
+maxY = max(yDomain+deltaY);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -76,8 +78,9 @@ for iTime=1:length(t)
 	% get rid of the xticks because we're going to put a colorbar below with the same info.
 	set( gca, 'xtick', [])
 	
-	xlim([min(xDomain) max(xDomain)])
-	ylim([min(yDomain) max(yDomain)])
+	
+	xlim([minX maxX])
+	ylim([minY maxY])
 	
 	% label everything
 	title( sprintf('Floats advected by a Poincare Wave field, colored by initial position, hour %.1f', t(iTime)/3600), 'fontsize', 28, 'FontName', 'Helvetica' );
@@ -86,7 +89,7 @@ for iTime=1:length(t)
 	% add a color bar
 	cb = colorbar( 'location', 'SouthOutside' );
 	set(get(cb,'xlabel'),'String', 'distance', 'FontSize', 24.0, 'FontName', 'Helvetica');
-	set( gca, 'clim', [min(x) max(x)] );
+	set( gca, 'clim', [minX maxX] );
 	
 	% write everything out	
 	output = sprintf('%s/%03d', FramesFolder,iTime-1);
