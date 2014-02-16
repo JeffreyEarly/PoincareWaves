@@ -49,6 +49,7 @@ slope = P(1)
 
 [psi,lambda]=sleptap(size(cv_mooring,1),3);
 [fn,spp,snn,spn]=mspec(dt,cv_mooring,psi);
+fn=fn/(2*pi);
 figure, plot(fn, vmean(spp,2)), ylog
 hold on, plot(fn, vmean(snn,2))
 plot(fn,vmean(spp+snn,2))
